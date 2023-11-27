@@ -1,10 +1,10 @@
 import cookieParser from 'cookie-parser'
-import session from 'express-session'
+// import session from 'express-session'
 import express from 'express'
 import dotenv from 'dotenv'
 import ExpressMongoSanitize from 'express-mongo-sanitize'
 dotenv.config()
-import mongoose from 'mongoose'
+// import mongoose from 'mongoose'
 import bodyParser from 'body-parser'
 import cors from 'cors'
 import logger from 'morgan'
@@ -17,17 +17,17 @@ import useragent from 'express-useragent'
 
 const app = express()
 
-app.use(
-	session({
-		secret: process.env.ACCESS_TOKEN_SECRET,
-		resave: true,
-		saveUninitialized: true,
-		cookie: {
-			secure: false,
-			maxAge: 6000000,
-		},
-	})
-)
+// app.use(
+// 	session({
+// 		secret: process.env.ACCESS_TOKEN_SECRET,
+// 		resave: true,
+// 		saveUninitialized: true,
+// 		cookie: {
+// 			secure: false,
+// 			maxAge: 6000000,
+// 		},
+// 	})
+// )
 
 app.use(useragent.express())
 app.use(bodyParser.json({ limit: '50mb' }))
@@ -52,6 +52,10 @@ app.use(cookieParser())
 function customErrorLogger(...args) {
 	console.log('Custom error logger:', ...args) // tất cả các lỗi lên ghi lại tại đây
 }
-// app.use(helper.authenToken_web)
+// import * as router_api from './routers/api.js'
+app.use('/',router_api)
+app.get('/',(req, res, next) =>{
+	return res.send("ok")
+})
 
 

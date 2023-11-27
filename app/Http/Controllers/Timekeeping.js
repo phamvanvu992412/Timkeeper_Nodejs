@@ -1,56 +1,57 @@
 
 
-export const post_iclock_data = async (req, res) => {
+export const 
+post_iclock_data = async (req, res) => {
     const device_serial = req.query.SN
-
-    if (req.body) {
-        const data = req.body.trim().split('\n')
+    console.log(req.body)
+    // if (req.body) {
+    //     const data = req.body.trim().split('\n')
      
-        for(let i =0;i<data.length;i++){
-            const detail_data = data[i].split('\t')
-            if (Array.isArray(detail_data)) {
-                if (detail_data[0].includes('OPLOG 1')) {
-                } else if (detail_data[0].includes('OPLOG 2')) {
-                } else if (detail_data[0].includes('OPLOG 3')) {
-                } else if (detail_data[0].includes('OPLOG 4')) {
-                    await update_old_timekeeping(detail_data, device_serial)
-                } else if (detail_data[0].includes('OPLOG 5')) {
-                } else if (detail_data[0].includes('OPLOG 6')) {
-                } else if (detail_data[0].includes('OPLOG 7')) {
-                } else if (detail_data[0].includes('OPLOG 8')) {
-                } else if (detail_data[0].includes('OPLOG 9')) {
-                    await delete_user_timekeeper(detail_data, device_serial)
-                    //console.log("Xóa dữ liệu người dùng")
-                } else if (detail_data[0].includes('USER')) {
-                    await insert_new_user_timekeeper(detail_data, device_serial)
-                    // console.log("Dữ liệu đăng ký người dùng mới")
-                } else if (detail_data[0].includes('FP')) {
-                    await update_valid_fingerprint_user_timekeeper(detail_data, device_serial)
-                    // console.log("Dữ liệu dấu vân tay")
-                } else if (validator.isNumber(parseInt(detail_data[0])) && !detail_data[0].includes('OPLOG')) {
-                    const user_id = detail_data[0]
-                    await insert_timekeeping(detail_data, device_serial)
-                }
-            }
-        }
-    }
+    //     for(let i =0;i<data.length;i++){
+    //         const detail_data = data[i].split('\t')
+    //         if (Array.isArray(detail_data)) {
+    //             if (detail_data[0].includes('OPLOG 1')) {
+    //             } else if (detail_data[0].includes('OPLOG 2')) {
+    //             } else if (detail_data[0].includes('OPLOG 3')) {
+    //             } else if (detail_data[0].includes('OPLOG 4')) {
+    //                 await update_old_timekeeping(detail_data, device_serial)
+    //             } else if (detail_data[0].includes('OPLOG 5')) {
+    //             } else if (detail_data[0].includes('OPLOG 6')) {
+    //             } else if (detail_data[0].includes('OPLOG 7')) {
+    //             } else if (detail_data[0].includes('OPLOG 8')) {
+    //             } else if (detail_data[0].includes('OPLOG 9')) {
+    //                 await delete_user_timekeeper(detail_data, device_serial)
+    //                 //console.log("Xóa dữ liệu người dùng")
+    //             } else if (detail_data[0].includes('USER')) {
+    //                 await insert_new_user_timekeeper(detail_data, device_serial)
+    //                 // console.log("Dữ liệu đăng ký người dùng mới")
+    //             } else if (detail_data[0].includes('FP')) {
+    //                 await update_valid_fingerprint_user_timekeeper(detail_data, device_serial)
+    //                 // console.log("Dữ liệu dấu vân tay")
+    //             } else if (validator.isNumber(parseInt(detail_data[0])) && !detail_data[0].includes('OPLOG')) {
+    //                 const user_id = detail_data[0]
+    //                 await insert_timekeeping(detail_data, device_serial)
+    //             }
+    //         }
+    //     }
+    // }
     res.send('OK')
 }
 
 export const get_config = async (req, res) => {
 
     const SN = req.query.SN
-    if (SN) {
-        await ModelTimekeeper.updateOne(
-            { serial: SN },
-            {
-                $setOnInsert: {
-                    serial: SN,
-                },
-            },
-            { upsert: true }
-        )
-    }
+    // if (SN) {
+    //     await ModelTimekeeper.updateOne(
+    //         { serial: SN },
+    //         {
+    //             $setOnInsert: {
+    //                 serial: SN,
+    //             },
+    //         },
+    //         { upsert: true }
+    //     )
+    // }
     const config = `GET OPTION FROM: ${SN}\tATTLOGStamp=None\tOPERLOGStamp=99999999\tATTPHOTOStamp=None\tErrorDelay=30\tDelay=20\tTransTimes=00:00;14:05\tTransinterval=1\tTransFlag=1111000000\tTimeZone=7\tRealtime=1\tEncrypt=None`
     res.set('Content-Type', 'text/plain')
     res.send(config)
@@ -65,40 +66,40 @@ export const get_request = async (req, res) => {
     //     console.log("ok")
     //     return res.send('C:1:DATA USER PIN=1\tName=ABC')
     // }
-    if(serial){
-        const async_insert = await ModelDataAsyncTemporary.find({$and:[
-            {insert:false},
-            {device_serial:serial}
-        ]})
+    // if(serial){
+    //     const async_insert = await ModelDataAsyncTemporary.find({$and:[
+    //         {insert:false},
+    //         {device_serial:serial}
+    //     ]})
 
-        if(async_insert.length > 0){ // phải chạy insert trước
-            console.log("serial = ",serial)
-            let command = ''
-            for (let i = 0; i < async_insert.length; i++) {
-                command += `C:${i + 1}:DATA USER PIN=${async_insert[i].code}\tName=${async_insert[i].name}\tCard=${async_insert[i].card}\tPasswd=${async_insert[i].passwd}\tPri=${async_insert[i].pri}\r\n`
-            }
-            await ModelDataAsyncTemporary.updateMany({$and:[{insert:false},{serial:serial}]},{$set:{insert:true}})
+    //     if(async_insert.length > 0){ // phải chạy insert trước
+    //         console.log("serial = ",serial)
+    //         let command = ''
+    //         for (let i = 0; i < async_insert.length; i++) {
+    //             command += `C:${i + 1}:DATA USER PIN=${async_insert[i].code}\tName=${async_insert[i].name}\tCard=${async_insert[i].card}\tPasswd=${async_insert[i].passwd}\tPri=${async_insert[i].pri}\r\n`
+    //         }
+    //         await ModelDataAsyncTemporary.updateMany({$and:[{insert:false},{serial:serial}]},{$set:{insert:true}})
 
-            res.set('Content-Type', 'text/plain');
-            return res.send(`${command}`)
-        } else {
-            const async_update = await ModelDataAsyncTemporary.find({ $and: [{ update: false }, { insert: true }, { serial: serial }] })
-            if (async_update.length > 0) {
-                let command = ''
-                for (let i = 0; i < async_update.length; i++) {
+    //         res.set('Content-Type', 'text/plain');
+    //         return res.send(`${command}`)
+    //     } else {
+    //         const async_update = await ModelDataAsyncTemporary.find({ $and: [{ update: false }, { insert: true }, { serial: serial }] })
+    //         if (async_update.length > 0) {
+    //             let command = ''
+    //             for (let i = 0; i < async_update.length; i++) {
        
-                    for (let j = 0; j < async_update[i].fingerprint.length; j++) {
-                        command += `C:${i + 1}:DATA FP PIN=${async_update[i].code}\tFID=${async_update[i].fingerprint[j].fid}\tSize=${async_update[i].fingerprint[j].size}\tValid=${async_update[i].fingerprint[j].valid}\tTMP=${async_update[i].fingerprint[j].valid_tmp}\r\n`
-                    }
-                }
-                await ModelDataAsyncTemporary.deleteMany({ $and: [{ update: false }, { serial: serial }] })
-                console.log('đã update vân tay')
-                console.log(command)
-                res.set('Content-Type', 'text/plain')
-                return res.send(command)
-            }
-        }
-    }
+    //                 for (let j = 0; j < async_update[i].fingerprint.length; j++) {
+    //                     command += `C:${i + 1}:DATA FP PIN=${async_update[i].code}\tFID=${async_update[i].fingerprint[j].fid}\tSize=${async_update[i].fingerprint[j].size}\tValid=${async_update[i].fingerprint[j].valid}\tTMP=${async_update[i].fingerprint[j].valid_tmp}\r\n`
+    //                 }
+    //             }
+    //             await ModelDataAsyncTemporary.deleteMany({ $and: [{ update: false }, { serial: serial }] })
+    //             console.log('đã update vân tay')
+    //             console.log(command)
+    //             res.set('Content-Type', 'text/plain')
+    //             return res.send(command)
+    //         }
+    //     }
+    // }
 
     // if(flag==1){
     //     flag++
@@ -114,165 +115,10 @@ export const get_request = async (req, res) => {
 }
 export const result_requet = async (req, res) => {
     console.log('Kết quả = ', req.body)
-    // res.set('Content-Type', 'text/plain');
+    res.set('Content-Type', 'text/plain');
     res.send('OK')
 }
-const insert_new_user_timekeeper = async (data, device_serial) => {
-    try {
-        if (!Array.isArray(data)) return
-        const code = data[0].replace('USER PIN=', '').trim()
-        const name = data[1].replace('Name=', '')
-        const pri = data[2].replace('Pri=', '')
-        const passwd = data[3].replace('Passwd=', '')
-        const card = data[4].replace('Card=', '')
-        const data_user = await ModelUsertimekeeper.findOne({
-            code: code,
-            device_serial: device_serial,
-        })
-        if (!data_user) {
-            await new ModelUsertimekeeper({
-                code: code,
-                name: name,
-                device_serial: device_serial,
-                card: card,
-                passwd: passwd,
-                pri: pri,
-            }).save()
-            console.log('Đã thêm người dùng mới')
-        } else {
-            await ModelUsertimekeeper.findByIdAndUpdate(data_user._id, {
-                name: name,
-                device_serial: device_serial,
-                card: card,
-                passwd: passwd,
-                pri: pri,
-            })
-            console.log('Đổi tên')
-        }
-        return
-    } catch (e) {
-        console.error(e)
-        return null
-    }
-}
 
-const update_valid_fingerprint_user_timekeeper = async (data, device_serial) => {
-    try {
-        if (!Array.isArray(data)) return
-        const code = data[0].replace('FP PIN=', '').trim()
-        const valid_tmp = data[4].replace('TMP=', '')
-        const valid = validator.tryParseInt(data[3].replace('Valid=', ''))
-        const fid = validator.tryParseInt(data[1].replace('FID=', ''))
-        const size = validator.tryParseInt(data[2].replace('Size=', ''))
-        const data_user = await ModelUsertimekeeper.findOne({
-            $and: [{ code: code }, { device_serial: device_serial }],
-        })
-
-        if (data_user) {
-            await ModelUsertimekeeper.updateOne(
-                { _id: data_user._id },
-                {
-                    $pull: {
-                        fingerprint: { fid: fid },
-                    },
-                }
-            )
-            await ModelUsertimekeeper.updateOne(
-                { _id: data_user._id },
-                {
-                    $push: {
-                        fingerprint: {
-                            valid_tmp: valid_tmp,
-                            valid: valid,
-                            fid: fid,
-                            size: size,
-                        },
-                    },
-                }
-            )
-        } else {
-            await new ModelUsertimekeeper({
-                device_serial: device_serial,
-                code: code,
-                fingerprint: [
-                    {
-                        valid_tmp: valid_tmp,
-                        valid: valid,
-                        fid: fid,
-                        size: size,
-                    },
-                ],
-            }).save()
-        }
-
-        return
-    } catch (e) {
-        console.error(e)
-    }
-}
-
-const delete_user_timekeeper = async (data, device_serial) => {
-    try {
-        if (!Array.isArray(data)) return
-        const code = data[3].trim()
-        await ModelUsertimekeeper.findOneAndDelete({
-            code: code,
-            device_serial: device_serial,
-        })
-        return
-    } catch (e) {
-        console.error(e)
-        return null
-    }
-}
-
-const insert_timekeeping = async (data, device_serial) => {
-    try {
-        const code = data[0].trim()
-        const time = data[1].trim()
-        const dataTime = await ModelTimekeeping.findOne({
-            $and: [{ code: code }, { device_serial: device_serial }, { string_time: time }],
-        })
-        if (dataTime) {
-        } else {
-            const timekeeper = await ModelTimekeeper.findOne({serial:device_serial.trim()})
-
-            const data_user = await ModelUser.findOne({ ID: code })
-            const part_id = data_user ? data_user.part_id : null
-            const branch_id = data_user ? data_user.branch_id : null
-
-            const new_data = {
-                code: code,
-                device_serial: device_serial,
-                time: new Date(time),
-                string_time: time,
-                part_id: part_id,
-                branch_id: branch_id,
-            }
-            console.log("---------------------------------------------------------------------------------------",code)
-            if(timekeeper){
-                const hour_time_zone =  7 - timekeeper.time_zone
-                new_data.time.setHours(new_data.time.getHours() + hour_time_zone)
-                console.log({
-                    "Múi giờ": timekeeper.time_zone,
-                    "Gio insert:":new_data.time,
-                    "giờ bị trừ": hour_time_zone
-                })
-            }
-            await new ModelTimekeeping(new_data).save()
-        }
-    } catch (e) {
-        console.error(e)
-        return
-    }
-}
-
-const update_old_timekeeping = async (data, device_serial) => {
-    try {
-        console.log('CẬP NHẬT LẠI DỮ LIỆU CŨ')
-        return
-    } catch (e) {}
-}
 
 // export const render_view_list_timekeeper = async (req, res) => {
 //     try {
